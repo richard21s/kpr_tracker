@@ -37,19 +37,20 @@ Many people struggle to clearly plan their home financing — especially underst
 
 ## 📂 Project Structure
 
-<pre> ``` shared-motoko-kprtracker/ ├── backend/ │ └── app.mo ├── frontend/ │ ├── index.html │ ├── main.js │ ├── styles.css │ └── ... ├── dfx.json ├── mops.toml └── README.md ``` </pre>
+KARINA/
+│
+├── backend/            # Contains mortgage simulation logic in Motoko
+│   └── app.mo
+│
+├── frontend/           # Contains user interface (HTML, JS, CSS)
+│   ├── index.html
+│   ├── main.js
+│   └── styles.css
+│
+├── dfx.json            # Internet Computer configuration
+├── mops.toml           # Motoko dependency management
+└── README.md           # Project documentation
 
-Directory descriptions:
-
-    backend/: Contains mortgage simulation logic in Motoko
-
-    frontend/: Contains user interface (HTML, JS, CSS)
-
-    dfx.json: Internet Computer configuration
-
-    mops.toml: Motoko dependency management
-
-    README.md: Project documentation
 ---
 
 ## 🛠️ Getting Started
