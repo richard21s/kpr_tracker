@@ -36,13 +36,16 @@ Many people struggle to clearly plan their home financing — especially underst
 ---
 
 ## 📂 Project Structure
-
-shared-motoko-kprtracker/
-│
-├── backend/            # KPR logic written in Motoko
-├── frontend/           # UI for simulation and AI analysis
-├── dfx.json            # ICP project configuration
-├── mops.toml           # Motoko dependencies
+KARINA/
+├── backend/ // Mortgage logic written in Motoko
+│ └── app.mo
+├── frontend/ // Frontend files (HTML, CSS, JS)
+│ ├── index.html
+│ ├── main.js
+│ ├── styles.css
+│ └── ...
+├── dfx.json // ICP configuration
+├── mops.toml // Motoko dependencies
 └── README.md
 
 ---
@@ -51,19 +54,23 @@ shared-motoko-kprtracker/
 
 1. **Clone the repository:**
 
-git clone https://github.com/username/shared-motoko-kprtracker.git
-cd shared-motoko-kprtracker
+```
+git clone https://github.com/username/KARINA.git
+cd KARINA
+```
 
 2. **Install and run the frontend:**
-
+```
 cd frontend
 npm install
 npm run dev
+```
 
 3. **Run the backend locally using DFX:**
-
+```
 dfx start --background
 dfx deploy
+```
 
 ---
 
