@@ -36,7 +36,7 @@ Many people struggle to clearly plan their home financing — especially underst
 ---
 
 ## 📂 Project Structure
-
+```
 KARINA/
 │
 ├── backend/            # Contains mortgage simulation logic in Motoko
@@ -50,7 +50,7 @@ KARINA/
 ├── dfx.json            # Internet Computer configuration
 ├── mops.toml           # Motoko dependency management
 └── README.md           # Project documentation
-
+```
 ---
 
 ## 🛠️ Getting Started
