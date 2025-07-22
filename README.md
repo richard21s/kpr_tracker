@@ -36,14 +36,14 @@ Many people struggle to clearly plan their home financing — especially underst
 ---
 
 ## 📂 Project Structure
-
-<pre> ``` KARINA/ ├── backend/ │ └── app.mo ├── frontend/ │ ├── index.html │ ├── main.js │ ├── styles.css │ └── ... ├── dfx.json ├── mops.toml └── README.md ``` </pre>
-
+```
+<pre> KARINA/ ├── backend/ │ └── app.mo ├── frontend/ │ ├── index.html │ ├── main.js │ ├── styles.css │ └── ... ├── dfx.json ├── mops.toml └── README.md  </pre>
+```
 Directory descriptions:
 
-    backend/: Contains mortgage simulation logic in Motoko
+    backend : Contains mortgage simulation logic in Motoko
 
-    frontend/: Contains user interface (HTML, JS, CSS)
+    frontend : Contains user interface (HTML, JS, CSS)
 
     dfx.json: Internet Computer configuration
 
