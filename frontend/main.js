@@ -71,14 +71,15 @@ window.addEventListener("DOMContentLoaded", async () => {
   const grafikKPR = document.getElementById("grafikKPR");
   const exportCSV = document.getElementById("exportCSV");
 
+  if (DEBUG) {
+    loginStatus.innerText = `🧪 Mode pengembangan aktif`;
+  }
 
   // Tambah Skema Bunga
-  const skemaBunga = document.getElementById("addSkema");
-  if (skemaBunga) {
-    skemaBunga.addEventListener("click", () => {
-      const div = document.createElement("div");
-      div.classList.add("bunga-item");
-      div.innerHTML = `
+  document.getElementById("addSkema").addEventListener("click", () => {
+    const div = document.createElement("div");
+    div.classList.add("bunga-item");
+    div.innerHTML = `
       <label>Mulai (th)</label><input type="number" class="start" required>
       <label>Selesai (th)</label><input type="number" class="end" required>
       <label>Bunga (%)</label><input type="number" class="rate" step="0.01" required>
@@ -90,10 +91,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       <label>Cicilan Bulanan</label><input type="number" class="cicilan" required>
       <button type="button" class="hapusSkema">Hapus</button><hr/>
     `;
-      div.querySelector(".hapusSkema").addEventListener("click", () => div.remove());
-      bungaContainer.appendChild(div);
-    });
-  }
+    div.querySelector(".hapusSkema").addEventListener("click", () => div.remove());
+    bungaContainer.appendChild(div);
+  });
 
   // Tambah Pelunasan Ekstra
   document.getElementById("addPelunasan").addEventListener("click", () => {
@@ -196,23 +196,11 @@ Tolong jawab dalam format yang jelas dan mudah dipahami oleh non-finansial sekal
     const aiData = await aiRes.json();
     const hasilAI = aiData.choices?.[0]?.message?.content || "AI tidak menjawab.";
 
-    console.log("Hasil AI", hasilAI);
-    console.log("data", data);
+    await backend.saveKPR({ ...data, hasilAI });
 
-    // Inject dummy email jika belum login
-    let email = localStorage.getItem("email");
-    if (!email) {
-      email = "dummy@email.com";
-      localStorage.setItem("email", email);
-    }
-
-    // Kirim data ke backend
-    await backend.saveKPR(email, { ...data, hasilAI });
-
-    console.log("berhasil save KPR");
     greeting.style.display = "block";
     greeting.innerText = hasilAI;
-    console.log("mau get KPR")
+
     const allKPR = await backend.getKPR();
     const index = allKPR.length - 1;
     let fullSimulasi = []; // data asli lengkap
@@ -278,31 +266,28 @@ Tolong jawab dalam format yang jelas dan mudah dipahami oleh non-finansial sekal
       a.download = "simulasi_kpr.csv";
       a.click();
     };
-    const downloadICS = document.getElementById("downloadICS");
-    if (downloadICS) {
-      downloadICS.onclick = () => {
-        const pad = (num) => String(num).padStart(2, "0");
+    document.getElementById("downloadICS").onclick = () => {
+      const pad = (num) => String(num).padStart(2, "0");
 
-        const startDate = new Date(data.tanggalMulai);
-        const events = simulasi.map(([bulan, pokok, bunga, penalti]) => {
-          const eventDate = new Date(startDate);
-          eventDate.setMonth(eventDate.getMonth() + Number(bulan) - 1);
-          const y = eventDate.getFullYear();
-          const m = pad(eventDate.getMonth() + 1);
-          const d = pad(eventDate.getDate());
+      const startDate = new Date(data.tanggalMulai);
+      const events = simulasi.map(([bulan, pokok, bunga, penalti]) => {
+        const eventDate = new Date(startDate);
+        eventDate.setMonth(eventDate.getMonth() + Number(bulan) - 1);
+        const y = eventDate.getFullYear();
+        const m = pad(eventDate.getMonth() + 1);
+        const d = pad(eventDate.getDate());
 
-          const dateStr = `${y}${m}${d}`;
-          const total = pokok + bunga + penalti;
+        const dateStr = `${y}${m}${d}`;
+        const total = pokok + bunga + penalti;
 
-          return `
+        return `
 BEGIN:VEVENT
 SUMMARY:Cicilan KPR Bulan ${bulan}
 DESCRIPTION:Pokok: Rp${pokok.toLocaleString("id-ID")}\\nBunga: Rp${bunga.toLocaleString("id-ID")}\\nPenalti: Rp${penalti.toLocaleString("id-ID")}\\nTotal: Rp${total.toLocaleString("id-ID")}
 DTSTART;VALUE=DATE:${dateStr}
 DTEND;VALUE=DATE:${dateStr}
 END:VEVENT`;
-        });
-      }
+      });
 
       const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -322,35 +307,33 @@ END:VCALENDAR`;
       alert("📅 File berhasil diunduh!\nKlik dua kali untuk menambahkan ke Google Calendar atau aplikasi kalender lainnya.");
     };
   });
-  const historyButton = document.getElementById("lihatHistoriBtn");
-  if (historyButton) {
-    // Lihat histori
-    historyButton.addEventListener("click", async () => {
-      const histori = await backend.getKPR();
-      let output = "";
 
-      histori.forEach((entry, index) => {
-        const harga = entry.hargaRumah ? Number(entry.hargaRumah).toLocaleString("id-ID") : "-";
-        const tenor = entry.tenorBulan ? Number(entry.tenorBulan) / 12 : "-";
-        const mulai = entry.tanggalMulai || "-";
-        const analisa = entry.tanggalAnalisa || "-";
-        const keterangan = entry.keterangan?.trim() || "-";
-        const hasilAI = entry.hasilAI || "-";
+  // Lihat histori
+  document.getElementById("lihatHistoriBtn").addEventListener("click", async () => {
+    const histori = await backend.getKPR();
+    let output = "";
 
-        const skema = buildSkemaText(entry.bungaSkema);
-        const pelunasan = buildPelunasanText(entry.pelunasanEkstra);
-        const penalti = buildPenaltiText(entry.penalti || []);
+    histori.forEach((entry, index) => {
+      const harga = entry.hargaRumah ? Number(entry.hargaRumah).toLocaleString("id-ID") : "-";
+      const tenor = entry.tenorBulan ? Number(entry.tenorBulan) / 12 : "-";
+      const mulai = entry.tanggalMulai || "-";
+      const analisa = entry.tanggalAnalisa || "-";
+      const keterangan = entry.keterangan?.trim() || "-";
+      const hasilAI = entry.hasilAI || "-";
 
-        output += `#${index + 1} - Harga: Rp${harga}\n`;
-        output += `Tenor: ${tenor} tahun, Mulai: ${mulai}, Analisa: ${analisa}\n`;
-        output += `Keterangan: ${keterangan}\n`;
-        output += `📊 Skema Cicilan:\n${skema}\n`;
-        output += `💵 Pelunasan Ekstra:\n${pelunasan}\n`;
-        output += `⚠️ Penalti:\n${penalti}\n`;
-        output += `🧠 Hasil AI:\n${hasilAI}\n\n`;
-      });
+      const skema = buildSkemaText(entry.bungaSkema);
+      const pelunasan = buildPelunasanText(entry.pelunasanEkstra);
+      const penalti = buildPenaltiText(entry.penalti || []);
 
-      document.getElementById("historiOutput").innerText = output || "Belum ada data.";
+      output += `#${index + 1} - Harga: Rp${harga}\n`;
+      output += `Tenor: ${tenor} tahun, Mulai: ${mulai}, Analisa: ${analisa}\n`;
+      output += `Keterangan: ${keterangan}\n`;
+      output += `📊 Skema Cicilan:\n${skema}\n`;
+      output += `💵 Pelunasan Ekstra:\n${pelunasan}\n`;
+      output += `⚠️ Penalti:\n${penalti}\n`;
+      output += `🧠 Hasil AI:\n${hasilAI}\n\n`;
     });
-  }
+
+    document.getElementById("historiOutput").innerText = output || "Belum ada data.";
+  });
 });
